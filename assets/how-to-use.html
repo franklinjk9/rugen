@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Use - RiseupVPN Config Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        /* Style for custom list bullets */
+        .step-list h3::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            background-color: #0891b2; /* cyan-600 */
+            color: white;
+            font-weight: 700;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        body {
+            counter-reset: step-counter;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div class="container mx-auto max-w-3xl p-4 sm:p-8">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-10">
+            <h1 class="text-3xl sm:text-4xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">How It Works</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">Generate a custom `.ovpn` file to use RiseupVPN with any standard OpenVPN client.</p>
+
+            <div class="space-y-8 prose prose-lg dark:prose-invert max-w-none step-list">
+
+                <div>
+                    <h3 class="text-2xl font-bold flex items-center">
+                        Configure Your Connection
+                    </h3>
+                    <p>First, customize the VPN configuration to suit your needs on the main page.</p>
+                    <ul class="list-disc pl-8">
+                        <li><strong>Protocol:</strong> Choose <strong>UDP</strong> for faster speeds (great for streaming) or <strong>TCP</strong> for better reliability on unstable networks.</li>
+                        <li><strong>Locations:</strong> Select one or more server locations you'd like to use.</li>
+                        <li><strong>Advanced Options:</strong> It's highly recommended to keep <strong>Prevent DNS Leaks</strong> enabled to protect your privacy.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold flex items-center">
+                        Generate and Download
+                    </h3>
+                    <p>Once you've made your selections, complete the CAPTCHA and click the "Generate & Download" button to get your custom <code>.ovpn</code> configuration file.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold flex items-center">
+                        Import and Connect
+                    </h3>
+                    <p>To use the file, you need an OpenVPN client. If you don't have one, download the right client for your platform from the list below. Then, simply import the <code>.ovpn</code> file into the client and click connect.</p>
+                </div>
+
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">Recommended Clients</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-gray-100 dark:bg-gray-900/50 p-4 rounded-lg">
+                        <h4 class="font-bold text-lg">Windows & macOS</h4>
+                        <a href="https://openvpn.net/client-connect-vpn-for-windows/" target="_blank" rel="noopener noreferrer" class="text-cyan-600 dark:text-cyan-400 hover:underline">OpenVPN Connect &rarr;</a><br>
+                        <a href="https://tunnelblick.net/" target="_blank" rel="noopener noreferrer" class="text-cyan-600 dark:text-cyan-400 hover:underline">Tunnelblick (macOS only) &rarr;</a>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-900/50 p-4 rounded-lg">
+                        <h4 class="font-bold text-lg">Linux</h4>
+                        <p class="text-sm">Install via your package manager: <code>sudo apt install openvpn</code> or <code>sudo dnf install openvpn</code>.</p>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-900/50 p-4 rounded-lg">
+                        <h4 class="font-bold text-lg">Android</h4>
+                        <a href="https://play.google.com/store/apps/details?id=de.blinkt.openvpn" target="_blank" rel="noopener noreferrer" class="text-cyan-600 dark:text-cyan-400 hover:underline">OpenVPN for Android &rarr;</a>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-900/50 p-4 rounded-lg">
+                        <h4 class="font-bold text-lg">iOS</h4>
+                        <a href="https://apps.apple.com/us/app/openvpn-connect/id590379981" target="_blank" rel="noopener noreferrer" class="text-cyan-600 dark:text-cyan-400 hover:underline">OpenVPN Connect &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="/" class="text-cyan-600 dark:text-cyan-400 hover:underline font-medium">&larr; Back to Generator</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "rugen",
+  "version": "1.0.1",
+  "description": "A Cloudflare Worker to generate RiseupVPN OpenVPN configuration files.",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.26.0"
+  }
+}

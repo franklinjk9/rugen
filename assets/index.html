@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RiseupVPN Config Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          animation: {
+            'spin-slow': 'spin 3s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    #animated-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      background-color: #87CEEB;
+      transition: background-color 1.5s ease-in-out;
+    }
+    .dark #animated-background {
+      background-color: #0d1a2f;
+    }
+
+    .celestial-object {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: all 1.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sun { 
+      width: 140px;
+      height: 140px;
+      background-color: #FFD700; 
+      top: 8%;
+      border-radius: 50%;
+      animation: pulse-shine 4s infinite ease-in-out;
+    }
+    
+    .moon { 
+      width: 100px;
+      height: 100px;
+      background-color: #f5f3ce; 
+      top: 110%;
+      border-radius: 50%;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+    }
+
+    .dark .sun { top: 110%; }
+    .dark .moon { top: 15%; }
+
+    @keyframes pulse-shine {
+      0% { box-shadow: 0 0 20px 5px rgba(255, 223, 0, 0.7); }
+      50% { box-shadow: 0 0 45px 25px rgba(255, 223, 0, 0.3); }
+      100% { box-shadow: 0 0 20px 5px rgba(255, 223, 0, 0.7); }
+    }
+
+    .sun-logo-container {
+        width: 130px;
+        height: 130px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-image: ${sunlogo};
+    }
+
+    .moon-logo-container {
+        width: 65px;
+        height: 65px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-image: ${moonlogo};
+    }
+    
+    .cloud {
+        position: absolute;
+        width: 200px;
+        height: 60px;
+        background: white;
+        border-radius: 30px;
+        opacity: 0.6;
+        animation: drift 60s linear infinite;
+    }
+    .cloud::before, .cloud::after {
+        content: '';
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+    }
+    .cloud::before { width: 100px; height: 100px; top: -50px; left: 30px; }
+    .cloud::after { width: 70px; height: 70px; top: -30px; right: 20px; }
+    .cloud.c1 { top: 10%; left: -250px; transform: scale(0.8); animation-duration: 70s; }
+    .cloud.c2 { top: 20%; left: -500px; transform: scale(1.1); animation-duration: 50s; }
+    .cloud.c3 { top: 15%; left: -800px; transform: scale(0.6); animation-duration: 80s; }
+
+    @keyframes drift {
+        from { transform: translateX(0); }
+        to { transform: translateX(2200px); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-slide-in { animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .theme-transition { 
+      transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                  color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+    .location-options::-webkit-scrollbar { display: none; }
+    .location-options { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="theme-transition min-h-screen">
+
+  <div id="animated-background">
+    <div class="celestial-object sun">
+        <div class="sun-logo-container"></div>
+    </div>
+    <div class="celestial-object moon">
+        <div class="moon-logo-container"></div>
+    </div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+  </div>
+
+  <div class="relative min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto">
+      <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-6 sm:p-8 lg:p-10 space-y-6 animate-slide-in relative">
+        
+        <div class="absolute top-4 left-4 right-4 flex justify-between items-center">
+            <a href="https://github.com/your-username/your-repo" target="_blank" rel="noopener noreferrer" class="theme-transition p-3 rounded-xl bg-gray-100/80 dark:bg-gray-700/80 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-600/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="/how-to-use" class="theme-transition py-3 px-4 rounded-xl bg-gray-100/80 dark:bg-gray-700/80 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-600/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 text-sm font-bold text-cyan-600 dark:text-cyan-400">
+                How to Use
+            </a>
+            <button id="theme-toggle" class="theme-toggle theme-transition p-3 rounded-xl bg-gray-100/80 dark:bg-gray-700/80 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-600/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+              <svg id="sun-icon" class="theme-icon w-5 h-5 text-yellow-500 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+              <svg id="moon-icon" class="theme-icon w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            </button>
+        </div>
+
+        <div class="text-center space-y-3 pt-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl shadow-lg mb-4 hover:shadow-xl hover:scale-105 transition-all duration-300">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">RiseupVPN</h1>
+          <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 font-medium">OpenVPN Config Generator</p>
+        </div>
+
+        <form action="/generate" method="POST" class="space-y-6" id="config-form">
+          <div class="theme-transition bg-gray-100/60 dark:bg-gray-700/30 rounded-2xl border border-gray-300/60 dark:border-gray-600/50 p-5 sm:p-6 space-y-5 hover:shadow-lg smooth-transition">
+            
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center mb-3">
+                <svg class="w-5 h-5 mr-2 text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M12 3v1.5m0 16.5v-1.5m3.75-16.5v1.5m0 16.5v-1.5M5.625 6.375l-1.125-1.125m15.75 15.75l-1.125-1.125M18.375 5.625l-1.125 1.125m-15.75 15.75l-1.125-1.125" /></svg>
+                Protocol
+              </h3>
+              <div id="protocol-toggle" class="relative flex items-center w-32 bg-gray-200 dark:bg-gray-700 rounded-full p-1 cursor-pointer">
+                  <input type="radio" name="protocol" value="tcp" id="proto-tcp" class="sr-only" checked>
+                  <input type="radio" name="protocol" value="udp" id="proto-udp" class="sr-only">
+                  <div class="mover absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white dark:bg-gray-800 rounded-full shadow-md transition-transform duration-300 ease-in-out"></div>
+                  <label for="proto-tcp" class="flex-1 text-center z-10 py-1 text-sm font-bold text-gray-800 dark:text-gray-200 transition-colors">TCP</label>
+                  <label for="proto-udp" class="flex-1 text-center z-10 py-1 text-sm font-bold text-gray-500 dark:text-gray-400 transition-colors">UDP</label>
+              </div>
+            </div>
+
+            <div id="location-dropdown-container">
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center mb-3">
+                <svg class="w-5 h-5 mr-2 text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                Locations
+              </h3>
+              <div class="relative">
+                  <button type="button" id="location-button" class="theme-transition w-full flex justify-between items-center text-left bg-white/50 dark:bg-gray-700/50 border border-gray-300/60 dark:border-gray-600/50 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500/50">
+                      <span id="location-button-text" class="font-medium text-gray-800 dark:text-gray-200">All Locations</span>
+                      <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  <div id="location-options" class="location-options hidden absolute z-10 mt-1 w-full max-h-60 overflow-y-auto bg-white/90 dark:bg-gray-700/90 backdrop-blur-md rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-600/50">
+                      <p class="text-gray-500 dark:text-gray-400 p-4 text-center">Loading...</p>
+                  </div>
+              </div>
+            </div>
+
+            <!-- Other Options -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center mb-3">
+                <svg class="w-5 h-5 mr-2 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                Advanced
+              </h3>
+              <div class="space-y-2">
+                <label class="option-card theme-transition flex items-center space-x-3 p-2 rounded-xl hover:bg-white/70 dark:hover:bg-gray-600/30 cursor-pointer group smooth-transition">
+                  <input id="no-dns-leak" name="no-dns-leak" type="checkbox" class="w-5 h-5 rounded border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 text-cyan-600 focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-0">
+                  <span class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 theme-transition">Prevent DNS Leaks</span>
+                  <div class="relative">
+                    <button type="button" id="dns-info-button" class="ml-1 text-gray-400 hover:text-cyan-500">
+                      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                    </button>
+                    <div id="dns-info-tooltip" class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-20">
+                      Forces all DNS requests through the VPN tunnel to prevent your ISP from seeing your browsing activity. Highly recommended.
+                      <div class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-800"></div>
+                    </div>
+                  </div>
+                </label>
+                <label class="option-card theme-transition flex items-center space-x-3 p-2 rounded-xl hover:bg-white/70 dark:hover:bg-gray-600/30 cursor-pointer group smooth-transition">
+                  <input id="no-ipv6" name="no-ipv6" type="checkbox" class="w-5 h-5 rounded border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 text-cyan-600 focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-0">
+                  <span class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 theme-transition">Disable IPv6</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-center">
+            <div class="cf-turnstile" data-sitekey="${siteKey || '1x00000000000000000000AA'}" data-theme="auto"></div>
+          </div>
+          <div class="pt-2">
+            <button type="submit" id="generate-btn" class="generate-button w-full relative overflow-hidden group bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+              <div class="flex items-center justify-center space-x-3">
+                <svg id="icon-default" class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <svg id="icon-loading" class="animate-spin w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span id="btn-text" class="text-lg">Generate & Download</span>
+              </div>
+            </button>
+          </div>
+        </form>
+        <div class="text-center pt-4 border-t border-gray-200/50 dark:border-gray-600/50">
+          <div class="flex justify-center items-center space-x-4 mb-2">
+              <a href="/donate" class="text-sm font-semibold text-gray-800 bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:text-gray-900 py-2 px-5 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-800">Donate</a>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400">This service is not affiliated with Riseup.net</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="dark-mode-song" loop>
+    <source src="${darkModeAudio}" type="audio/mpeg">
+  </audio>
+
+  <script>
+    class ThemeManager {
+      constructor() {
+        this.audioPlayer = document.getElementById('dark-mode-song');
+        this.bindInitialInteraction();
+        this.init();
+      }
+      
+      bindInitialInteraction() {
+        const handleFirstInteraction = () => {
+          if (document.documentElement.classList.contains('dark')) {
+            this.audioPlayer?.play().catch(e => console.log("User interaction unlocked audio."));
+          }
+        };
+        document.body.addEventListener('click', handleFirstInteraction, { once: true });
+        document.body.addEventListener('keydown', handleFirstInteraction, { once: true });
+      }
+
+      init() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+          this.enableDarkMode(false);
+        } else {
+          this.enableLightMode();
+        }
+        
+        this.updateIcons();
+        this.bindEvents();
+      }
+      
+      enableDarkMode(playAudio = true) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        localStorage.setItem('theme', 'dark');
+        if (playAudio) {
+          this.audioPlayer?.play().catch(e => console.log("Autoplay was prevented."));
+        }
+      }
+      
+      enableLightMode() {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        this.audioPlayer?.pause();
+      }
+      
+      toggle() {
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        if (isDark) {
+          this.enableLightMode();
+        } else {
+          this.enableDarkMode();
+        }
+        
+        this.updateIcons();
+        this.updateTurnstileTheme();
+      }
+      
+      updateIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        document.getElementById('sun-icon').style.display = isDark ? 'none' : 'block';
+        document.getElementById('moon-icon').style.display = isDark ? 'block' : 'none';
+      }
+      
+      updateTurnstileTheme() {
+        const turnstile = document.querySelector('.cf-turnstile');
+        if (turnstile) {
+          turnstile.setAttribute('data-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+      }
+      
+      bindEvents() {
+        document.getElementById('theme-toggle')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.toggle();
+        });
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (!localStorage.getItem('theme')) {
+            if (e.matches) {
+              this.enableDarkMode();
+            } else {
+              this.enableLightMode();
+            }
+            this.updateIcons();
+            this.updateTurnstileTheme();
+          }
+        });
+      }
+    }
+    
+    class FormManager {
+      constructor() {
+        this.form = document.getElementById('config-form');
+        this.bindEvents();
+      }
+      
+      bindEvents() {
+        this.form?.addEventListener('submit', this.handleSubmit.bind(this));
+      }
+
+      async handleSubmit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this.form);
+        const turnstileResponse = formData.get('cf-turnstile-response');
+
+        if (!turnstileResponse) {
+          this.showAlert('⚠️ Please complete the CAPTCHA challenge', 'error');
+          return;
+        }
+
+        this.updateButtonState(true);
+
+        try {
+            const response = await fetch('/generate', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const header = response.headers.get('Content-Disposition');
+                let filename = 'riseup.ovpn';
+                if (header) {
+                    const parts = header.split(';');
+                    parts.forEach(part => {
+                        if (part.trim().startsWith('filename=')) {
+                            filename = part.split('=')[1].replaceAll('"', '').trim();
+                        }
+                    });
+                }
+                
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                
+                if (window.turnstile) {
+                    window.turnstile.reset();
+                }
+                this.updateButtonState(false);
+
+            } else {
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            this.showAlert('An unexpected error occurred.', 'error');
+            this.updateButtonState(false);
+        }
+      }
+
+      updateButtonState(loading) {
+        const btn = document.getElementById('generate-btn');
+        const btnText = document.getElementById('btn-text');
+        const iconDefault = document.getElementById('icon-default');
+        const iconLoading = document.getElementById('icon-loading');
+        if (loading) {
+          btn.disabled = true;
+          btnText.textContent = 'Generating...';
+          iconDefault.classList.add('hidden');
+          iconLoading.classList.remove('hidden');
+        } else {
+          btn.disabled = false;
+          btnText.textContent = 'Generate & Download';
+          iconDefault.classList.remove('hidden');
+          iconLoading.classList.add('hidden');
+        }
+      }
+      
+      showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        const bgColor = type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+        alertDiv.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-all duration-300`;
+        alertDiv.innerHTML = message;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.classList.remove('translate-x-full'), 100);
+        setTimeout(() => {
+          alertDiv.classList.add('translate-x-full');
+          setTimeout(() => { if (document.body.contains(alertDiv)) { document.body.removeChild(alertDiv); } }, 300);
+        }, 3000);
+      }
+    }
+
+    class UIManager {
+        constructor() {
+            this.initProtocolToggle();
+            this.initInfoTooltip();
+            this.initLocationDropdown();
+        }
+
+        initProtocolToggle() {
+            const toggle = document.getElementById('protocol-toggle');
+            if (!toggle) return;
+            const mover = toggle.querySelector('.mover');
+            const tcpLabel = toggle.querySelector('label[for="proto-tcp"]');
+            const udpLabel = toggle.querySelector('label[for="proto-udp"]');
+
+            const setToggle = () => {
+                if (document.getElementById('proto-udp').checked) {
+                    mover.style.transform = 'translateX(100%)';
+                    udpLabel.classList.remove('text-gray-500', 'dark:text-gray-400');
+                    udpLabel.classList.add('text-gray-800', 'dark:text-gray-200');
+                    tcpLabel.classList.add('text-gray-500', 'dark:text-gray-400');
+                    tcpLabel.classList.remove('text-gray-800', 'dark:text-gray-200');
+                } else {
+                    mover.style.transform = 'translateX(0)';
+                    tcpLabel.classList.remove('text-gray-500', 'dark:text-gray-400');
+                    tcpLabel.classList.add('text-gray-800', 'dark:text-gray-200');
+                    udpLabel.classList.add('text-gray-500', 'dark:text-gray-400');
+                    udpLabel.classList.remove('text-gray-800', 'dark:text-gray-200');
+                }
+            };
+            toggle.addEventListener('click', (e) => {
+                if (e.target.htmlFor === 'proto-tcp') document.getElementById('proto-tcp').checked = true;
+                if (e.target.htmlFor === 'proto-udp') document.getElementById('proto-udp').checked = true;
+                setToggle();
+            });
+            setToggle();
+        }
+
+        initInfoTooltip() {
+            const button = document.getElementById('dns-info-button');
+            const tooltip = document.getElementById('dns-info-tooltip');
+            if (!button || !tooltip) return;
+
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                tooltip.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => tooltip.classList.add('hidden'));
+        }
+        
+        initLocationDropdown() {
+            const container = document.getElementById('location-dropdown-container');
+            const button = document.getElementById('location-button');
+            const optionsContainer = document.getElementById('location-options');
+            if (!container || !button || !optionsContainer) return;
+
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                optionsContainer.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => optionsContainer.classList.add('hidden'));
+            optionsContainer.addEventListener('click', (e) => e.stopPropagation());
+
+            this.loadLocations(optionsContainer, document.getElementById('location-button-text'));
+        }
+
+        async loadLocations(container, buttonText) {
+            try {
+                const response = await fetch('/locations');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const locations = await response.json();
+                this.renderLocationCheckboxes(container, buttonText, locations);
+            } catch (error) {
+                container.innerHTML = '<p class="text-red-500 p-4 text-center">Failed to load locations.</p>';
+                console.error('Error fetching locations:', error);
+            }
+        }
+
+        renderLocationCheckboxes(container, buttonText, locations) {
+            container.innerHTML = '';
+            
+            const createCheckbox = (value, text, checked = false) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center space-x-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600';
+                const label = document.createElement('label');
+                label.className = 'flex-1 flex items-center space-x-3 cursor-pointer font-medium text-gray-700 dark:text-gray-300';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'locations';
+                checkbox.value = value;
+                checkbox.checked = checked;
+                checkbox.className = 'w-5 h-5 rounded text-cyan-600 focus:ring-2 focus:ring-cyan-500/50 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500';
+                const span = document.createElement('span');
+                span.textContent = text;
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                div.appendChild(label);
+                return div;
+            };
+
+            const allDiv = createCheckbox('All', 'All Locations', true);
+            container.appendChild(allDiv);
+
+            locations.forEach(location => {
+                const div = createCheckbox(location.name, `${countryCodeToEmoji(location.code)} ${location.name}`);
+                container.appendChild(div);
+            });
+
+            const allCheckbox = container.querySelector('input[value="All"]');
+            const locationCheckboxes = Array.from(container.querySelectorAll('input[name="locations"]:not([value="All"])'));
+
+            const updateUI = () => {
+                const selectedLocations = locationCheckboxes.filter(cb => cb.checked);
+                
+                if (allCheckbox.checked || selectedLocations.length === 0) {
+                    buttonText.textContent = 'All Locations';
+                } else if (selectedLocations.length === 1) {
+                    buttonText.textContent = selectedLocations[0].value;
+                } else {
+                    buttonText.textContent = `${selectedLocations.length} locations selected`;
+                }
+            };
+
+            allCheckbox.addEventListener('change', () => {
+                if (allCheckbox.checked) {
+                    locationCheckboxes.forEach(cb => { cb.checked = false; });
+                }
+                updateUI();
+            });
+
+            locationCheckboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const anyLocationChecked = locationCheckboxes.some(c => c.checked);
+                    allCheckbox.checked = !anyLocationChecked;
+                    updateUI();
+                });
+            });
+
+            updateUI();
+        }
+    }
+    
+    function countryCodeToEmoji(code) {
+        if (!code || code.length !== 2) return '🌐';
+        const OFFSET = 127397;
+        const [first, second] = [...code.toUpperCase()].map(char => char.charCodeAt(0) + OFFSET);
+        return String.fromCodePoint(first, second);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      new ThemeManager();
+      new FormManager();
+      new UIManager();
+    });
+  </script>
+</body>
+</html>
