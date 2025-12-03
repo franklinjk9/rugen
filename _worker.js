@@ -167,7 +167,7 @@ function generateRemoteList(gatewaysJson, locations) {
       const openvpnTransport = gateway.capabilities.transport.find((t) => t.type === "openvpn");
       if (openvpnTransport && Array.isArray(openvpnTransport.ports)) {
         openvpnTransport.ports.forEach((port) => {
-          remoteLines.push(`remote ${ip} ${port} # ${host} (${location})`);
+          remoteLines.push(`remote ${ip} ${port}`);
         });
       }
     });
